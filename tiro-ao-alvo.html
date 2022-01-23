@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interagindo com o periferico</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0px;
+      padding: 0px;
+      border: 0px;
+    }
+
+    html,
+    body {
+      width: 100vw;
+      height: 100vh;
+    }
+
+    canvas {
+      border: 1px solid;
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      /* width: 600px;
+      height: 400px; */
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- <canvas width="600" height="400"></canvas> -->
+  <canvas width="850" height="650"></canvas>
+
+  <script>
+
+    function getRandomArbitrary(min, max) {
+      return Math.round(Math.random() * (max - min) + min);
+    }
+
+    const hexSymbols = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'];
+    const randomHexColor = ['#'];
+
+    const c = console.log;
+    const canva = document.querySelector('canvas');
+    const brushTool = canva.getContext('2d');
+    
+    function getRandomHexColor() {
+
+      while (randomHexColor.length > 1)
+        randomHexColor.pop();
+
+      while (randomHexColor.length <= 6)
+        randomHexColor.push(hexSymbols[getRandomArbitrary(0, 15)]);
+
+      return randomHexColor.join('');
+    }
+
+    function getLimits() {
+      c('offsetWidth', canva.offsetWidth);
+      c('offsetHeight', canva.offsetHeight);
+
+      c('clientWidth', canva.clientWidth);
+      c('clientHeight', canva.clientHeight);
+
+      c('scrollWidth', canva.scrollWidth);
+      c('scrollHeight', canva.scrollHeight);
+
+      c('width', canva.width);
+      c('height', canva.height);
+    }
+    
+    function drawCircle(x, y, raio, cor) {
+
+      brushTool.fillStyle = cor;
+      brushTool.beginPath();
+      brushTool.arc(x, y, raio, 0, 7);
+      brushTool.fill();
+    }
+
+    brushTool.fillStyle = 'blue';
+    brushTool.fillStyle = 'white';
+    brushTool.fillRect(0, 0, canva.width, canva.height);
+
+    const raio = 15;
+    const secondCircle = raio * 2;
+    const thirdCircle = raio * 3;
+
+    const arcShotRange = secondCircle; //mudar
+    const steps = 1;
+
+    let posX = getRandomArbitrary(thirdCircle, canva.width - thirdCircle);
+    let posY = getRandomArbitrary(thirdCircle, canva.height - thirdCircle);
+
+    let increasePosX = true;
+    let increasePosY = true;
+
+    const widthMaxLimit = canva.width - thirdCircle;
+    const heightMaxLimit =  canva.height - thirdCircle;
+
+    let color;
+
+    function runBall() {
+
+      drawCircle(posX, posY, thirdCircle + 1, 'white');
+
+      if (posX > widthMaxLimit || posX < thirdCircle)
+      {
+        increasePosX = !increasePosX;
+        color = getRandomHexColor();
+      }
+
+      if (posY > heightMaxLimit || posY < thirdCircle)
+      {
+        increasePosY = !increasePosY;
+        color = getRandomHexColor();
+      }
+
+      posX = increasePosX ? posX + steps : posX - steps;
+      posY = increasePosY ? posY + steps : posY - steps;
+
+      drawCircle(posX, posY, thirdCircle, color); // maior círculo
+      drawCircle(posX, posY, secondCircle, 'white');
+      drawCircle(posX, posY, raio, color); // menor circulo
+    }
+    
+    canva.onclick = e => {
+      
+      if (e.offsetX > posX - arcShotRange && e.offsetX < posX + arcShotRange && e.offsetY > posY - arcShotRange && e.offsetY < posY + arcShotRange)
+      {
+        c(e);
+      }
+        
+    }
+    
+    const interval = setInterval(runBall, 1);
+    
+  </script>
+</body>
+
+</html>
